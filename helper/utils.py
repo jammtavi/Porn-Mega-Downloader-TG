@@ -4,8 +4,12 @@ from datetime import datetime
 from pytz import timezone
 from pyrogram.errors.exceptions import MessageNotModified, FloodWait, UserNotParticipant
 from pyrogram import enums
-import asyncio, logging
+import asyncio
+import logging
 import threading
+from youtube_dl.utils import DownloadError
+import youtube_dl
+import os
 from config import Config, Txt
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -100,7 +104,7 @@ def edit_msg(client, message, to_edit):
     except MessageNotModified:
         pass
     except FloodWait as e:
-        client.loop.create_task(asyncio.sleep(e.x))
+        client.loop.create_task(asyncio.sleep(e.value))
     except TypeError:
         pass
 
@@ -140,3 +144,51 @@ async def force_sub(bot, cmd):
     text = "**Sᴏʀʀy Dᴜᴅᴇ Yᴏᴜ'ʀᴇ Nᴏᴛ Jᴏɪɴᴇᴅ My Cʜᴀɴɴᴇʟ 😐. Sᴏ Pʟᴇᴀꜱᴇ Jᴏɪɴ Oᴜʀ Uᴩᴅᴀᴛᴇ Cʜᴀɴɴᴇʟ Tᴏ Cᴄᴏɴᴛɪɴᴜᴇ**"
 
     return await cmd.reply_text(text=text, reply_markup=InlineKeyboardMarkup(buttons))
+
+
+async def run_async(func, *args, **kwargs):
+    loop = asyncio.get_running_loop()
+    print("This is loop", loop)
+    return await loop.run_in_executor(None, func, *args, **kwargs)
+
+
+async def Download_Porn_Video(client, message, link):
+
+    btn1 = InlineKeyboardButton(
+        "Search Here", switch_inline_query_current_chat="",)
+    btn2 = InlineKeyboardButton("Go Inline", switch_inline_query="")
+    url = link
+    msg = await message.reply_text("Downloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", reply_to_message_id=message.id)
+
+    # user_id = message.from_user.id
+
+    # if user_id in active_list:
+    #     await msg.edit("Sorry! You can download only one video at a time")
+
+    #     return
+    # else:
+    #     active_list.append(user_id)
+
+    ydl_opts = {
+        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)]
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        try:
+            await run_async(ydl.download, [url])
+        except DownloadError:
+            await msg.edit("Sorry, There was a problem with that particular video")
+            return
+
+    for file in os.listdir('.'):
+        if file.endswith(".mp4"):
+            await message.reply_video(f"{file}", caption=f"**Here Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
+                                      reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+            os.remove(f"{file}")
+            break
+        else:
+            continue
+
+    await msg.delete()
+    # active_list.remove(user_id)
+    return True
