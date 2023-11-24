@@ -97,16 +97,16 @@ def humanbytes(size):
         raised_to_pow += 1
     return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
 
-async def edit_msg(client, message, to_edit):
+
+def edit_msg(client, message, to_edit):
     try:
-        await message.edit(to_edit)
+        client.loop.create_task(message.edit(to_edit))
     except MessageNotModified:
         pass
     except FloodWait as e:
-        await asyncio.sleep(e.x)
+        client.loop.create_task(asyncio.sleep(e.value))
     except TypeError:
         pass
-        
 
 
 def download_progress_hook(d, message, client):
@@ -182,8 +182,8 @@ async def Download_Porn_Video(client, message, link):
 
     for file in os.listdir('.'):
         if file.endswith(".mp4"):
-            await message.reply_video(f"{file}", caption=f"**Here Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
-                                      reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+            await client.send_video(message.from_user.id, f"{file}", caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
+                                    reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
             os.remove(f"{file}")
             break
         else:
