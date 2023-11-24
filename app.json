@@ -18,7 +18,7 @@
         "FORCE_SUB": {
             "description":  "ID of a Channel which you want to do Force Sub to use the bot. Example: -1001981748188",
             "value": "",
-            "required": false 
+            "required": true 
         },
         "BOT_TOKEN": {
             "description": "Your Bot Token From @BotFather",
