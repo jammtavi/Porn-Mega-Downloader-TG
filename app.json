@@ -15,10 +15,6 @@
             "description": "Your API Hash From my.telegram.org ",
             "value": ""
         },
-        "WEBHOOK": {
-            "description": "if your server is need web service! value = True else value = False",
-            "value": "False"
-        },
         "FORCE_SUB": {
             "description":  "ID of a Channel which you want to do Force Sub to use the bot. Example: -1001981748188",
             "value": "",
@@ -38,11 +34,6 @@
         "DB_URL": {
             "description": "Your Mongo DB URL Obtained From mongodb.com",
             "value": ""
-        },
-        "DB_NAME":{ 
-            "description":"Your Mongo DB Database Name ",
-            "value": "SnowPro_Users",
-            "required": false
         },
         "START_PIC": {
             "description": "Your Bot start cmd Pic from @MT_TelegraPH_Bot",
