@@ -23,7 +23,8 @@ else:
 
 
 active_list = []
-download_queue = asyncio.Queue()
+queue = []
+pending_link = []
 
 
 def link_fil(filter, client, update):
@@ -35,22 +36,6 @@ def link_fil(filter, client, update):
 
 link_filter = filters.create(link_fil, name="link_filter")
 
-
-async def process_queue(client):
-    while True:
-        message = await download_queue.get()
-
-        user_id = message.from_user.id
-        if user_id not in active_list:
-            active_list.append(user_id)
-
-        link = message.text
-        done = await Download_Porn_Video(client, message, link)
-
-        if done:
-            active_list.remove(user_id)
-
-        download_queue.task_done()
 
 @Client.on_inline_query()
 async def search(client, InlineQuery: InlineQuery):
@@ -119,14 +104,30 @@ async def search(client, InlineQuery: InlineQuery):
 @Client.on_message(link_filter)
 async def _download_video(client, message: Message):
 
-    await download_queue.put(message)
+    user_id = message.from_user.id
+
+    if not pending_link:
+        pending_link.append(message.text)
+
+    elif message.text in pending_link:
+        message.reply_text("**You Should not Download The Same Video... ⛔**")
+        return
+
+    if user_id not in active_list:
+        active_list.append(user_id)
+
+    elif user_id in active_list:
+        pending_link.append(message.text)
+        await message.reply_text("**Please Wait This is in Queue...**")
+        return
+
+    for link in pending_link:
+        done = await Download_Porn_Video(client, message, link)
+        if done:
+            continue
 
 
 @Client.on_message(filters.command("cc"))
 async def download_video(client, message: Message):
     files = os.listdir("downloads")
     await message.reply(files)
-
-
-# Start the queue processing task
-asyncio.ensure_future(process_queue(Client))
