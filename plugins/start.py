@@ -24,7 +24,8 @@ async def start(client, message):
         return
 
     user = message.from_user
-    await db.add_user(message.from_user.id)
+    if not await db.is_user_exist(user.id):
+        await db.add_user(user.id)
     button = InlineKeyboardMarkup([[
         InlineKeyboardButton(
             '⛅ Uᴩᴅᴀᴛᴇꜱ', url='https://t.me/+HzGpLAZXTxoyYTNl'),
