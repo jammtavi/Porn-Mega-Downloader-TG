@@ -125,6 +125,8 @@ async def _download_video(client, message: Message):
         done = await Download_Porn_Video(client, message, link)
         if done:
             continue
+          
+    active_list.remove(user_id)
 
 
 @Client.on_message(filters.command("cc"))
