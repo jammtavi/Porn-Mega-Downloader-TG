@@ -118,7 +118,7 @@ async def _download_video(client, message: Message):
 
     elif user_id in active_list:
         pending_link.append(message.text)
-        await message.reply_text("**Please Wait This is in Queue...**")
+        await message.reply_text("**Please Wait This is in Queue...**", reply_to_message_id=message.id)
         return
 
     for link in pending_link:
