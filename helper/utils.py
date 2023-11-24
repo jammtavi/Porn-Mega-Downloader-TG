@@ -97,16 +97,16 @@ def humanbytes(size):
         raised_to_pow += 1
     return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
 
-
-def edit_msg(client, message, to_edit):
+async def edit_msg(client, message, to_edit):
     try:
-        client.loop.create_task(message.edit(to_edit))
+        await message.edit(to_edit)
     except MessageNotModified:
         pass
     except FloodWait as e:
-        client.loop.create_task(asyncio.sleep(e.value))
+        await asyncio.sleep(e.x)
     except TypeError:
         pass
+        
 
 
 def download_progress_hook(d, message, client):
