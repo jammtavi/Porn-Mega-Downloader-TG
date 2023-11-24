@@ -38,13 +38,13 @@ async def broadcast_handler(bot: Client, m: Message):
     start_time = time.time()
     total_users = await db.total_users_count()
     async for user in all_users:
-        sts = await send_msg(user['_id'], broadcast_msg)
+        sts = await send_msg(user['id'], broadcast_msg)
         if sts == 200:
            success += 1
         else:
            failed += 1
         if sts == 400:
-           await db.delete_user(user['_id'])
+           await db.delete_user(user['id'])
         done += 1
         if not done % 20:
            await sts_msg.edit(f"Bʀᴏᴀᴅᴄᴀꜱᴛ Iɴ Pʀᴏɢʀᴇꜱꜱ: \nTᴏᴛᴀʟ Uꜱᴇʀꜱ {total_users} \nCᴏᴍᴩʟᴇᴛᴇᴅ: {done} / {total_users}\nSᴜᴄᴄᴇꜱꜱ: {success}\nFᴀɪʟᴇᴅ: {failed}")
