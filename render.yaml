@@ -5,7 +5,7 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
-    repo: https://github.com/ritesh-0/RenameSnowProBot.git
+    repo: https://github.com/ritesh-0/RenameSnowProBot
     branch: main
     autoDeploy: false
     envVars:
