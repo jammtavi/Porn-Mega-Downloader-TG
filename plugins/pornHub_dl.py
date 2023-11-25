@@ -138,7 +138,7 @@ async def download_video(client, message: Message):
             for idx, link in enumerate(user):
                 links += f"{(idx+1)}. {link}\n"
 
-            await message.reply_text(f"{user}\n\n {links}")
+            await message.reply_text(f"👤 <code>{message.from_user.first_name}</code>\n\n <code>{links}</code>")
         else:
             s = await message.reply_text("**NO PROCESS FOUND !")
             await asyncio.sleep(5)
