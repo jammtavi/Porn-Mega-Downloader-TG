@@ -109,7 +109,7 @@ async def _download_video(client, message: Message):
 
     elif user_id in User_Queue:
         User_Queue[user_id].append(message.text)
-        await message.reply_text(f"➕ Added to Queue <code> {message.text} </code> ➕\n\nUse /queue to check Queue")
+        await message.reply_text(f"➕ Added to Queue <code> {message.text} </code> ➕\n\nUse /queue to check Queue", reply_to_message_id=message.id)
         return
 
     else:
