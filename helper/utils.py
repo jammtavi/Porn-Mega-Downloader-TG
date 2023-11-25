@@ -170,7 +170,8 @@ async def Download_Porn_Video(client, message, link):
     #     active_list.append(user_id)
 
     ydl_opts = {
-        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)]
+        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
+
     }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -182,9 +183,11 @@ async def Download_Porn_Video(client, message, link):
 
     for file in os.listdir('.'):
         if file.endswith(".mp4"):
-            await client.send_video(message.from_user.id, f"{file}", caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
-                                    reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
-            os.remove(f"{file}")
+            if file.startswith(file):
+                await client.send_video(message.from_user.id, f"{file}", caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
+                                        reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+                os.remove(f"{file}")
+
             break
         else:
             continue
