@@ -27,6 +27,11 @@
             "value": "",
             "required": true 
         },
+        "BOT_TOKEN": {
+            "description": "Your Bot Username From @BotFather",
+            "value": "",
+            "required": true 
+        },
         "ADMIN": {
             "description":"Add Your User ID multiple is use space to split",
             "value": "",
