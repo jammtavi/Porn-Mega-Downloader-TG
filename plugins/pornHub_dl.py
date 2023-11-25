@@ -115,12 +115,12 @@ async def _download_video(client, message: Message):
         User_Queue.update({user_id: [message.text]})
 
     for link in User_Queue[user_id]:
-        try:
+        if link:
             done = await Download_Porn_Video(client, message, link)
-        except:
-            pass
-        if done:
-            continue
+            if done:
+                continue
+        else:
+          break
 
     print(User_Queue)
     User_Queue.pop(user_id)
