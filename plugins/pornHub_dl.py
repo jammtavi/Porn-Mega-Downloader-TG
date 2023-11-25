@@ -109,25 +109,29 @@ async def _download_video(client, message: Message):
 
     elif user_id in User_Queue:
         User_Queue[user_id].append(message.text)
+        await message.reply_text(f"➕ Added to Queue <code> {message.text} </code> ➕\n\nUse /queue to check Queue")
         return
 
     else:
         User_Queue.update({user_id: [message.text]})
 
     for link in User_Queue[user_id]:
-        if link:
+        try:
             done = await Download_Porn_Video(client, message, link)
-            if done:
-                continue
-        else:
-          break
+        except Exception as e:
+            print(e)
+            break
 
-    print(User_Queue)
+        if done:
+            continue
+
+    # clean up the queue
+    print("All links Downloaded Successfully ✅")
+    await client.send_message(user_id, f"**List:- ** <code> {User_Queue[user_id]} </code>\n\n🎯 All links Downloaded Successfully ✅")
     User_Queue.pop(user_id)
-    print(User_Queue)
 
 
-@Client.on_message(filters.command("cc"))
+@Client.on_message(filters.command("queue"))
 async def download_video(client, message: Message):
     try:
         if message.from_user.id in User_Queue:
@@ -140,7 +144,7 @@ async def download_video(client, message: Message):
 
             await message.reply_text(f"👤 <code>{message.from_user.first_name}</code>\n\n <code>{links}</code>")
         else:
-            s = await message.reply_text("**NO PROCESS FOUND !")
+            s = await message.reply_text(f"**NO PROCESS FOUND !**\n\n FOR {message.from_user.first_name} 👤")
             await asyncio.sleep(5)
             await s.delete()
     except Exception as e:
