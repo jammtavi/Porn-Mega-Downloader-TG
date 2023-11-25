@@ -149,3 +149,12 @@ async def download_video(client, message: Message):
             await s.delete()
     except Exception as e:
         await message.reply_text(f"{e}\n\n\n **Error !**")
+
+@Client.on_message(filters.command("cc") & filters.user(Config.ADMIN))
+async def pfc(client, message):
+  list_file = ""
+
+  for file in os.listdir():
+    list_file += f"{os.listdir()}\n"
+    
+  await message.reply_text(f"{list_file}")
