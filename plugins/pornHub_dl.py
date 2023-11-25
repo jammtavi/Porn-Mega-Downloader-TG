@@ -22,9 +22,7 @@ else:
     print("Download Path Created")
 
 
-active_list = []
-queue = []
-pending_link = []
+User_Queue = {}
 
 
 def link_fil(filter, client, update):
@@ -103,33 +101,47 @@ async def search(client, InlineQuery: InlineQuery):
 
 @Client.on_message(link_filter)
 async def _download_video(client, message: Message):
-
+    global User_Queue
     user_id = message.from_user.id
 
-    if not pending_link:
-        pending_link.append(message.text)
+    if not User_Queue:
+        User_Queue.update({user_id: [message.text]})
 
-    elif message.text in pending_link:
-        message.reply_text("**You Should not Download The Same Video... ⛔**")
+    elif user_id in User_Queue:
+        User_Queue[user_id].append(message.text)
         return
 
-    if user_id not in active_list:
-        active_list.append(user_id)
+    else:
+        User_Queue.update({user_id: [message.text]})
 
-    elif user_id in active_list:
-        pending_link.append(message.text)
-        await message.reply_text("**Please Wait This is in Queue...**", reply_to_message_id=message.id)
-        return
-
-    for link in pending_link:
-        done = await Download_Porn_Video(client, message, link)
+    for link in User_Queue[user_id]:
+        try:
+            done = await Download_Porn_Video(client, message, link)
+        except:
+            pass
         if done:
             continue
-          
-    active_list.remove(user_id)
+
+    print(User_Queue)
+    User_Queue.pop(user_id)
+    print(User_Queue)
 
 
 @Client.on_message(filters.command("cc"))
 async def download_video(client, message: Message):
-    files = os.listdir("downloads")
-    await message.reply(files)
+    try:
+        if message.from_user.id in User_Queue:
+
+            user = User_Queue[message.from_user.id]
+            print(user)
+            links = ""
+            for idx, link in enumerate(user):
+                links += f"{(idx+1)}. {link}\n"
+
+            await message.reply_text(f"{user}\n\n {links}")
+        else:
+            s = await message.reply_text("**NO PROCESS FOUND !")
+            await asyncio.sleep(5)
+            await s.delete()
+    except Exception as e:
+        await message.reply_text(f"{e}\n\n\n **Error !**")
