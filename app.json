@@ -27,7 +27,7 @@
             "value": "",
             "required": true 
         },
-        "BOT_TOKEN": {
+        "BOT_USERNAME": {
             "description": "Your Bot Username From @BotFather",
             "value": "",
             "required": true 
