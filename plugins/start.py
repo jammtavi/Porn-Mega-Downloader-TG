@@ -15,6 +15,8 @@ async def _(bot: Client, cmd: Message):
     if not await is_subscribed(bot, cmd):
         return await force_sub(bot, cmd)
     await handle_user_status(bot, cmd)
+    await cmd.continue_propagation()
+
 
 @Client.on_message(filters.private & filters.command("start"))
 async def start(client, message):
@@ -34,13 +36,13 @@ async def start(client, message):
         InlineKeyboardButton('❗ Hᴇʟᴩ', callback_data='help')
     ],
         [
-        InlineKeyboardButton("Search Porn Here",switch_inline_query_current_chat="",)
+        InlineKeyboardButton("Search Porn Here",
+                             switch_inline_query_current_chat="",)
     ]])
     if Config.START_PIC:
         await message.reply_photo(Config.START_PIC, caption=Txt.START_TXT.format(user.mention), reply_markup=button)
     else:
         await message.reply_text(text=Txt.START_TXT.format(user.mention), reply_markup=button, disable_web_page_preview=True)
-
 
 
 # ⚠️ Handling CallBack Query⚠️
@@ -61,11 +63,12 @@ async def cb_handler(client, query: CallbackQuery):
                 InlineKeyboardButton('👨‍💻 Aʙᴏᴜᴛ', callback_data='about'),
                 InlineKeyboardButton('❗ Hᴇʟᴩ', callback_data='help')
             ],
-            [
-            InlineKeyboardButton("Search Porn Here",switch_inline_query_current_chat="",)
-        ]])
+                [
+                InlineKeyboardButton("Search Porn Here",
+                                     switch_inline_query_current_chat="",)
+            ]])
         )
-        
+
     elif data == "help":
         await query.message.edit_text(
             text=Txt.HELP_TXT,
