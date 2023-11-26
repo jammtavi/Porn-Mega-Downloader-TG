@@ -160,15 +160,6 @@ async def Download_Porn_Video(client, message, link):
     url = link
     msg = await message.reply_text(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", reply_to_message_id=message.id, disable_web_page_preview=True)
 
-    # user_id = message.from_user.id
-
-    # if user_id in active_list:
-    #     await msg.edit("Sorry! You can download only one video at a time")
-
-    #     return
-    # else:
-    #     active_list.append(user_id)
-
     ydl_opts = {
         "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
 
@@ -183,15 +174,12 @@ async def Download_Porn_Video(client, message, link):
 
     for file in os.listdir('.'):
         if file.endswith(".mp4"):
-            if file.startswith(file):
-                await client.send_video(message.from_user.id, f"{file}", caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
-                                        reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
-                os.remove(f"{file}")
-
+            await client.send_video(message.from_user.id, f"{file}", caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
+                                    reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+            os.remove(f"{file}")
             break
         else:
             continue
 
     await msg.delete()
-    # active_list.remove(user_id)
     return True
