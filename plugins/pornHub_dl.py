@@ -187,7 +187,7 @@ async def multiple_download(client, callback: CallbackQuery):
                     break
 
                 else:
-                    callback.answer("Please Send Valid Link !")
+                    await callback.answer("Please Send Valid Link !")
                     continue
 
         await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
