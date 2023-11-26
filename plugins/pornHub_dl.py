@@ -112,6 +112,7 @@ async def search(client, InlineQuery: InlineQuery):
 
 @Client.on_message(link_filter)
 async def options(client, message: Message):
+  try:
     if not await is_subscribed(client, message):
         return await force_sub(client, message)
 
@@ -121,7 +122,8 @@ async def options(client, message: Message):
                             [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
                         ])
                         )
-
+  except exception as e:
+    print(e)
 
 @Client.on_callback_query(filters.regex("^d"))
 async def single_download(client, callback: CallbackQuery):
