@@ -117,7 +117,7 @@ async def options(client, message: Message):
 
     await message.reply("What would like to do?", reply_to_message_id=message.id,
                         reply_markup=InlineKeyboardMarkup([
-                            [InlineKeyboardButton(text="🔻 Download 🔻", callback_da= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"a_{message.text}")],
+                            [InlineKeyboardButton(text="🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"ma_{message.text}")],
                             [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
                         ])
                         )
@@ -159,7 +159,7 @@ async def single_download(client, callback: CallbackQuery):
     active_list.remove(user_id)
 
 
-@Client.on_callback_query(filters.regex("^a"))
+@Client.on_callback_query(filters.regex("^ma"))
 async def multiple_download(client, callback: CallbackQuery):
     try:
         global User_Queue
