@@ -117,7 +117,7 @@ async def options(client, message: Message):
 
     await message.reply("What would like to do?", reply_to_message_id=message.id,
                         reply_markup=InlineKeyboardMarkup([
-                            [InlineKeyboardButton(text="🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"ma_{message.text}")],
+                            [InlineKeyboardButton(text="🔻 Download 🔻", callback_da= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"a_{message.text}")],
                             [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
                         ])
                         )
@@ -159,7 +159,7 @@ async def single_download(client, callback: CallbackQuery):
     active_list.remove(user_id)
 
 
-@Client.on_callback_query(filters.regex("^ma"))
+@Client.on_callback_query(filters.regex("^a"))
 async def multiple_download(client, callback: CallbackQuery):
     try:
         global User_Queue
@@ -188,37 +188,22 @@ async def multiple_download(client, callback: CallbackQuery):
                     continue
 
         await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
-        for link in User_Queue[user_id]:
+
+        number = 0
+        while True:
             try:
-                msg = await callback.message.reply_text(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
-                ydl_opts = {
-                    "progress_hooks": [lambda d: download_progress_hook(d, msg, client)]
-                }
-
-                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                    try:
-                        await run_async(ydl.download, [link])
-                    except DownloadError:
-                        await msg.edit("Sorry, There was a problem with that particular video")
-                        return
-
-                for file in os.listdir('.'):
-                    if file.endswith(".mp4"):
-                        await callback.message.reply_video(f"{file}", caption=f"**Here Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
-                                                        reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
-                        os.remove(f"{file}")
-                        break
-                    else:
-                        continue
-
-                await msg.delete()
+                link = User_Queue[user_id][number]
+                await Download_Porn_Video(client=client, callback=callback, link=link)
             except Exception as e:
                 print(e)
                 break
+            number+=1
+            continue
 
         # clean up the queue
+        print("All links Downloaded Successfully ✅")
+        await client.send_message(user_id, f"**List:- ** <code> {User_Queue[user_id]} </code>\n\n🎯 All links Downloaded Successfully ✅")
         User_Queue.pop(user_id)
-      
     except Exception as e:
         print('Error on line {}'.format(
             sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
