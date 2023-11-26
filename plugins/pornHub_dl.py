@@ -190,7 +190,28 @@ async def multiple_download(client, callback: CallbackQuery):
         await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
         for link in User_Queue[user_id]:
             try:
-                await Download_Porn_Video(client, callback, link)
+                msg = await callback.message.edit(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
+                ydl_opts = {
+                    "progress_hooks": [lambda d: download_progress_hook(d, callback.message, client)]
+                }
+
+                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                    try:
+                        await run_async(ydl.download, [link])
+                    except DownloadError:
+                        await callback.message.edit("Sorry, There was a problem with that particular video")
+                        return
+
+                for file in os.listdir('.'):
+                    if file.endswith(".mp4"):
+                        await callback.message.reply_video(f"{file}", caption=f"**Here Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
+                                                        reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+                        os.remove(f"{file}")
+                        break
+                    else:
+                        continue
+
+                await msg.delete()
             except Exception as e:
                 print(e)
                 break
