@@ -170,8 +170,12 @@ async def multiple_download(client, callback: CallbackQuery):
                 link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.", filters=filters.text)
 
                 if str(link.text).startswith("https://www.pornhub"):
-                    User_Queue[user_id].append(link.text)
-                    await callback.message.reply_text("Successfully Added To Queue ✅", reply_to_message_id=link.id)
+                    if link.text in User_Queue[user]:
+                        await callback.message.reply_text("This Link Is Already Added Don't Download Duplicate Video ⛔ ", reply_to_message_id=link.id)
+                        continue
+                    else:
+                        User_Queue[user_id].append(link.text)
+                        await callback.message.reply_text("Successfully Added To Queue ✅", reply_to_message_id=link.id)
 
                 elif link.text == "/done":
                     user = User_Queue[user_id]
