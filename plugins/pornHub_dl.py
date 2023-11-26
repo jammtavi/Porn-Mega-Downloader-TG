@@ -112,15 +112,18 @@ async def search(client, InlineQuery: InlineQuery):
 
 @Client.on_message(link_filter)
 async def options(client, message: Message):
-    if not await is_subscribed(client, message):
-        return await force_sub(client, message)
+    try:
+        if not await is_subscribed(client, message):
+            return await force_sub(client, message)
 
-    await message.reply("What would like to do?", reply_to_message_id=message.id,
-                        reply_markup=InlineKeyboardMarkup([
-                            [InlineKeyboardButton(text="🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
-                            [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
-                        ])
-                        )
+        await message.reply("What would like to do?", reply_to_message_id=message.id,
+                            reply_markup=InlineKeyboardMarkup([
+                                [InlineKeyboardButton(text="🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
+                                [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
+                            ])
+                            )
+    except Exception as e:
+        print(e)
 
 @Client.on_callback_query(filters.regex("^d"))
 async def single_download(client, callback: CallbackQuery):
@@ -170,12 +173,8 @@ async def multiple_download(client, callback: CallbackQuery):
                 link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.", filters=filters.text)
 
                 if str(link.text).startswith("https://www.pornhub"):
-                    if link.text in User_Queue[user]:
-                        await callback.message.reply_text("This Link Is Already Added Don't Download Duplicate Video ⛔ ", reply_to_message_id=link.id)
-                        continue
-                    else:
-                        User_Queue[user_id].append(link.text)
-                        await callback.message.reply_text("Successfully Added To Queue ✅", reply_to_message_id=link.id)
+                    User_Queue[user_id].append(link.text)
+                    await callback.message.reply_text("Successfully Added To Queue ✅", reply_to_message_id=link.id)
 
                 elif link.text == "/done":
                     user = User_Queue[user_id]
