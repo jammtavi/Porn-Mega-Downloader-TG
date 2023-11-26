@@ -122,7 +122,7 @@ async def options(client, message: Message):
                             [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
                         ])
                         )
-  except exception as e:
+  except Exception as e:
     print(e)
 
 @Client.on_callback_query(filters.regex("^d"))
