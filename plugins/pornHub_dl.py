@@ -109,8 +109,7 @@ async def _download_video(client, message: Message):
 
     elif user_id in User_Queue:
         User_Queue[user_id].append(message.text)
-        await message.reply_text(f"➕ Added to Queue <code> {message.text} </code> ➕\n\nUse /queue to check Queue", reply_to_message_id=message.id)
-        return
+        return await message.reply_text(f"➕ Added to Queue <code> {message.text} </code> ➕\n\nUse /queue to check Queue", reply_to_message_id=message.id)
 
     else:
         User_Queue.update({user_id: [message.text]})
@@ -145,16 +144,8 @@ async def download_video(client, message: Message):
             await message.reply_text(f"👤 <code>{message.from_user.first_name}</code>\n\n <code>{links}</code>")
         else:
             s = await message.reply_text(f"**NO PROCESS FOUND !**\n\n FOR {message.from_user.first_name} 👤")
+            os.listdir()
             await asyncio.sleep(5)
             await s.delete()
     except Exception as e:
         await message.reply_text(f"{e}\n\n\n **Error !**")
-
-@Client.on_message(filters.command("cc") & filters.user(Config.ADMIN))
-async def pfc(client, message):
-  list_file = ""
-
-  for file in os.listdir():
-    list_file += f"{os.listdir()}\n"
-    
-  await message.reply_text(f"{list_file}")
