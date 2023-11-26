@@ -112,18 +112,16 @@ async def search(client, InlineQuery: InlineQuery):
 
 @Client.on_message(link_filter)
 async def options(client, message: Message):
-  try:
-      if not await is_subscribed(client, message):
-          return await force_sub(client, message)
-  
-      await message.reply("What would like to do?", reply_to_message_id=message.id,
-                          reply_markup=InlineKeyboardMarkup([
-                              [InlineKeyboardButton(text="🔻 Download 🔻", callback_da= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"a_{message.text}")],
-                              [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
-                          ])
-                          )
-  except Exception as e:
-    print(e)
+    if not await is_subscribed(client, message):
+        return await force_sub(client, message)
+
+    await message.reply("What would like to do?", reply_to_message_id=message.id,
+                        reply_markup=InlineKeyboardMarkup([
+                            [InlineKeyboardButton(text="🔻 Download 🔻", callback_da= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"a_{message.text}")],
+                            [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
+                        ])
+                        )
+
 
 @Client.on_callback_query(filters.regex("^d"))
 async def single_download(client, callback: CallbackQuery):
