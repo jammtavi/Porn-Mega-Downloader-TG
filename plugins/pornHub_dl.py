@@ -196,8 +196,6 @@ async def multiple_download(client, callback: CallbackQuery):
                 break
 
         # clean up the queue
-        print("All links Downloaded Successfully ✅")
-        await client.send_message(user_id, f"**List:- ** <code> {User_Queue[user_id]} </code>\n\n🎯 All links Downloaded Successfully ✅")
         User_Queue.pop(user_id)
       
     except Exception as e:
