@@ -13,6 +13,5 @@ moviepy
 filetype
 tgcrypto
 pyromod
-python-arq
 hurry.filesize
 git+https://github.com/Snowball-0/mega.py.git
