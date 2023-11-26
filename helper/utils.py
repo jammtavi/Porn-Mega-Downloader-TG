@@ -182,4 +182,3 @@ async def Download_Porn_Video(client, callback, link):
             continue
 
     await msg.delete()
-    return True
