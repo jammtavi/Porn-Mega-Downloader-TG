@@ -185,14 +185,13 @@ async def multiple_download(client, callback: CallbackQuery):
                 break
 
             else:
-                await callback.answer("Please Send Valid Link !")
+                await callback.answer("Please Send a Valid Link!")
                 continue
 
-    await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
+    await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading; it may take some time...")
 
     number = 0
     while True:
-        
         # clean up the queue
         if number == len(User_Queue[user_id]):
             number = 0
@@ -200,34 +199,29 @@ async def multiple_download(client, callback: CallbackQuery):
             await client.send_message(user_id, f"**List:- ** <code> {User_Queue[user_id]} </code>\n\n🎯 All links Downloaded Successfully ✅")
             User_Queue.pop(user_id)
             break
-            
+
         link = User_Queue[user_id][number]
         msg = await callback.message.reply_text(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
 
         ydl_opts = {
-                "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
+            "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
+        }
 
-            }
-
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            
+        async with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             try:
-
-                await run_async(ydl.download, [link])
+                await ydl.download([link])
             except DownloadError:
                 await msg.edit(f"**Link:-** {link}\n\n☹️ Sorry, There was a problem with that particular video")
                 return
 
         for file in os.listdir('.'):
-        
             if file.endswith(".mp4"):
-                
-                await client.send_video(user_id, f"{file}", caption=f"**File Name:- <code>{file}</code>\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+                await client.send_video(user_id, f"{file}", caption=f"**File Name:- <code>{file}</code>\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}", reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
                 os.remove(f"{file}")
                 break
             else:
                 continue
 
         await msg.delete()
-        number+=1
+        number += 1
         continue
