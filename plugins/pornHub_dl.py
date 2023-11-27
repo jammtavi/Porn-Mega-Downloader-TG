@@ -163,82 +163,71 @@ async def single_download(client, callback: CallbackQuery):
 
 @Client.on_callback_query(filters.regex("^m"))
 async def multiple_download(client, callback: CallbackQuery):
-    try:
-        global User_Queue
-        user_id = callback.from_user.id
+    global User_Queue
+    user_id = callback.from_user.id
 
-        if user_id not in User_Queue:
-            User_Queue.update({user_id: [callback.data.split('_', 1)[1]]})
-            while True:
-                link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.", filters=filters.text)
-
-                if str(link.text).startswith("https://www.pornhub"):
-                    User_Queue[user_id].append(link.text)
-                    await callback.message.reply_text("Successfully Added To Queue ✅", reply_to_message_id=link.id)
-
-                elif link.text == "/done":
-                    user = User_Queue[user_id]
-                    links = ""
-                    for idx, link in enumerate(user):
-                        links += f"{(idx+1)}. {link}\n"
-
-                    await callback.message.reply_text(f"👤 <code>{callback.message.from_user.first_name}</code>\n\n <code>{links}</code>")
-                    break
-
-                else:
-                    await callback.answer("Please Send Valid Link !")
-                    continue
-
-        await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
-
-        number = 0
+    if user_id not in User_Queue:
+        User_Queue.update({user_id: [callback.data.split('_', 1)[1]]})
         while True:
-            # clean up the queue
-            print("NUMBER", number)
-            print("\nQUEU LENGTH", User_Queue[user_id])
-            if number == len(User_Queue[user_id]):
-                number = 0
-                print("All links Downloaded Successfully ✅")
-                await client.send_message(user_id, f"**List:- ** <code> {User_Queue[user_id]} </code>\n\n🎯 All links Downloaded Successfully ✅")
-                User_Queue.pop(user_id)
+            link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.", filters=filters.text)
+
+            if str(link.text).startswith("https://www.pornhub"):
+                User_Queue[user_id].append(link.text)
+                await callback.message.reply_text("Successfully Added To Queue ✅", reply_to_message_id=link.id)
+
+            elif link.text == "/done":
+                user = User_Queue[user_id]
+                links = ""
+                for idx, link in enumerate(user):
+                    links += f"{(idx+1)}. {link}\n"
+
+                await callback.message.reply_text(f"👤 <code>{callback.message.from_user.first_name}</code>\n\n <code>{links}</code>")
                 break
-                
+
+            else:
+                await callback.answer("Please Send Valid Link !")
+                continue
+
+    await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
+
+    number = 0
+    while True:
+        
+        # clean up the queue
+        if number == len(User_Queue[user_id]):
+            number = 0
+            print("All links Downloaded Successfully ✅")
+            await client.send_message(user_id, f"**List:- ** <code> {User_Queue[user_id]} </code>\n\n🎯 All links Downloaded Successfully ✅")
+            User_Queue.pop(user_id)
+            break
+            
+        link = User_Queue[user_id][number]
+        msg = await callback.message.reply_text(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
+
+        ydl_opts = {
+                "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
+
+            }
+
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            
             try:
-                link = User_Queue[user_id][number]
-                msg = await callback.message.reply_text(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
 
-                ydl_opts = {
-                      "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
+                await run_async(ydl.download, [link])
+            except DownloadError:
+                await msg.edit(f"**Link:-** {link}\n\n☹️ Sorry, There was a problem with that particular video")
+                return
 
-                 }
-
-                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                    
-                    try:
-
-                        await run_async(ydl.download, [link])
-                    except DownloadError:
-                        await msg.edit(f"**Link:-** {link}\n\n☹️ Sorry, There was a problem with that particular video")
-                        return
-
-                for file in os.listdir('.'):
+        for file in os.listdir('.'):
+        
+            if file.endswith(".mp4"):
                 
-                    if file.endswith(".mp4"):
-                        
-                        await client.send_video(user_id, f"{file}", caption=f"**File Name:- <code>{file}</code>\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
-                        os.remove(f"{file}")
-                        break
-                    else:
-                        continue
-
-                await msg.delete()
-            except Exception as e:
-                print(e)
+                await client.send_video(user_id, f"{file}", caption=f"**File Name:- <code>{file}</code>\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+                os.remove(f"{file}")
                 break
-            number+=1
-            continue
+            else:
+                continue
 
-      
-    except Exception as e:
-        print('Error on line {}'.format(
-            sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
+        await msg.delete()
+        number+=1
+        continue
