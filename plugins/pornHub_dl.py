@@ -202,26 +202,26 @@ async def multiple_download(client, callback: CallbackQuery):
 
                  }
 
-                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                   
-                   try:
-                     
-                     await run_async(ydl.download, [link])
-                   except DownloadError:
-                     await msg.edit(f"**Link:-** {link}\n\n☹️ Sorry, There was a problem with that particular video")
-                     return
+                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                    
+                    try:
 
-                 for file in os.listdir('.'):
-                   
-                   if file.endswith(".mp4"):
-                     
-                     await client.send_video(user_id, f"{file}", caption=f"**File Name:- <code>{file}</code>\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
-                     os.remove(f"{file}")
-                     break
-                   else:
-                     continue
+                        await run_async(ydl.download, [link])
+                    except DownloadError:
+                        await msg.edit(f"**Link:-** {link}\n\n☹️ Sorry, There was a problem with that particular video")
+                        return
 
-                 await msg.delete()
+                for file in os.listdir('.'):
+                
+                    if file.endswith(".mp4"):
+                        
+                        await client.send_video(user_id, f"{file}", caption=f"**File Name:- <code>{file}</code>\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+                        os.remove(f"{file}")
+                        break
+                    else:
+                        continue
+
+                await msg.delete()
             except Exception as e:
                 print(e)
                 break
