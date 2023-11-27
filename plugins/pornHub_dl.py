@@ -206,16 +206,16 @@ async def multiple_download(client, callback: CallbackQuery):
                    
                    try:
                      
-                     await run_async(ydl.download, [url])
+                     await run_async(ydl.download, [link])
                    except DownloadError:
-                     await msg.edit(f"**Link:-** {url}\n\n☹️ Sorry, There was a problem with that particular video")
+                     await msg.edit(f"**Link:-** {link}\n\n☹️ Sorry, There was a problem with that particular video")
                      return
 
                  for file in os.listdir('.'):
                    
                    if file.endswith(".mp4"):
                      
-                     await client.send_video(callback.from_user.id, f"{file}", caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+                     await client.send_video(user_id, f"{file}", caption=f"**File Name:- <code>{file}</code>\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
                      os.remove(f"{file}")
                      break
                    else:
