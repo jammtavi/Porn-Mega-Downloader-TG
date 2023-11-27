@@ -14,7 +14,7 @@ from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
 from youtube_dl.utils import DownloadError
 from helper.utils import force_sub, is_subscribed
 from config import Config
-from helper.utils import download_progress_hook, Download_Porn_Video
+from helper.utils import download_progress_hook
 
 
 if os.path.exists("downloads"):
@@ -193,6 +193,16 @@ async def multiple_download(client, callback: CallbackQuery):
 
         number = 0
         while True:
+            # clean up the queue
+            print("NUMBER", number)
+            print("\nQUEU LENGTH", User_Queue[user_id])
+            if number == len(User_Queue[user_id]):
+                number = 0
+                print("All links Downloaded Successfully ✅")
+                await client.send_message(user_id, f"**List:- ** <code> {User_Queue[user_id]} </code>\n\n🎯 All links Downloaded Successfully ✅")
+                User_Queue.pop(user_id)
+                break
+                
             try:
                 link = User_Queue[user_id][number]
                 msg = await callback.message.reply_text(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
@@ -228,11 +238,6 @@ async def multiple_download(client, callback: CallbackQuery):
             number+=1
             continue
 
-        # clean up the queue
-        number= 0
-        print("All links Downloaded Successfully ✅")
-        await client.send_message(user_id, f"**List:- ** <code> {User_Queue[user_id]} </code>\n\n🎯 All links Downloaded Successfully ✅")
-        User_Queue.pop(user_id)
       
     except Exception as e:
         print('Error on line {}'.format(
