@@ -118,15 +118,20 @@ async def options(client, message: Message):
 
         await message.reply("What would like to do?", reply_to_message_id=message.id,
                             reply_markup=InlineKeyboardMarkup([
-                                [InlineKeyboardButton(text="🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
-                                [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
+                                [InlineKeyboardButton(
+                                    text="🔻 Download 🔻", callback_data= f"d_{message.text}"),
+                                 InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
+
+                                [InlineKeyboardButton(
+                                    text="📺 Watch Video 📺    ",url=message.text)]
                             ])
                             )
     except Exception as e:
         print(e)
 
+
 @Client.on_callback_query(filters.regex("^d"))
-async def single_download(client, callback: CallbackQuery):
+async def single_download(client:Client , callback: CallbackQuery):
     url = callback.data.split("_", 1)[1]
     msg = await callback.message.edit(f"**Link:-** {url}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
     user_id = callback.message.from_user.id
@@ -190,29 +195,27 @@ async def multiple_download(client, callback: CallbackQuery):
 
     await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading. It may take some time...")
 
-    async def download_link(link):
+
+    for link in User_Queue[user_id]:
+        msg = await callback.message.edit(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
         ydl_opts = {
-            "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
+        "progress_hooks": [lambda d: download_progress_hook(d, callback.message, client)]
         }
 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             try:
-                await asyncio.create_task(ydl.download([link]))
+                await run_async(ydl.download, [link])
             except DownloadError:
-                await msg.edit(f"**Link:-** {link}\n\n☹️ Sorry, There was a problem with that particular video")
-
-    for number, link in enumerate(User_Queue[user_id]):
-        msg = await callback.message.reply_text(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
-        await asyncio.create_task(download_link(link))
+                await callback.message.edit("Sorry, There was a problem with that particular video")
+                continue
 
         for file in os.listdir('.'):
             if file.endswith(".mp4"):
-                await client.send_video(user_id, f"{file}", caption=f"**File Name:- <code>{file}</code>\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}", reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+                await callback.message.reply_video(f"{file}", caption=f"**File Name:-** <code>{file}</code>\n\n**Here Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
+                                                reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
                 os.remove(f"{file}")
                 break
-        else:
-            await msg.edit(f"**Link {number + 1}/{len(User_Queue[user_id])}:-** {link}\n\n☹️ Sorry, There was a problem with that particular video")
-
+            
         await msg.delete()
 
     await client.send_message(user_id, f"**List:- ** <code>{User_Queue[user_id]}</code>\n\n🎯 All links Downloaded Successfully ✅")
