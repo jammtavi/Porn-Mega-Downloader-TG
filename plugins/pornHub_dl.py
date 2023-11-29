@@ -204,7 +204,7 @@ async def multiple_download(client, callback: CallbackQuery):
 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             try:
-                await run_async(ydl.download, [User_Queue[user_id][n]])
+                await run_async(ydl.download, [User_Queue[user_id][0]])
             except DownloadError:
                 await callback.message.edit("Sorry, There was a problem with that particular video")
                 return
