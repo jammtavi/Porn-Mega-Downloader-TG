@@ -161,7 +161,7 @@ async def download_video(client:Client, message : Message):
         else:
             queue_links[user_id].append(url)
 
-        await msg.edit(f"Sorry! You can download only one video at a time\n\n⚠️ But Don't worry this files is added to queue when download is completed it'll start downloading one by one ✅\n\nQUEUE: {queue_links}")
+        await msg.edit(f"Sorry! You can download only one video at a time\n\n⚠️ But Don't worry this files is added to queue when download is completed it'll start downloading one by one ✅")
         return
     else:
         active_list.append(user_id)
