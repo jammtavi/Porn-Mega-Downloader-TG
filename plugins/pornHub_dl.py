@@ -195,9 +195,9 @@ async def multiple_download(client, callback: CallbackQuery):
 
     await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading. It may take some time...")
     
-    n = 0
+    
     while True:
-        msg = await callback.message.edit(f"**Link:-** {User_Queue[user_id][n]}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
+        msg = await callback.message.edit(f"**Link:-** {User_Queue[user_id][0]}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
         ydl_opts = {
         "progress_hooks": [lambda d: download_progress_hook(d, msg, client)]
         }
@@ -219,8 +219,8 @@ async def multiple_download(client, callback: CallbackQuery):
                 continue
 
         await msg.delete()
-        n += 1
-        if n == len(User_Queue[user_id]):
+        User_Queue[user_id].pop(0)
+        if not User_Queue[user_id]:
             break
         continue
         
