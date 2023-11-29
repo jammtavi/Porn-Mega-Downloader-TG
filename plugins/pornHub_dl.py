@@ -1,6 +1,5 @@
 import asyncio
 import os
-import sys
 
 import youtube_dl
 from pornhub_api import PornhubApi
@@ -22,11 +21,9 @@ if os.path.exists("downloads"):
 else:
     print("Download Path Created")
 
-btn1 = InlineKeyboardButton(
-    "Search Here", switch_inline_query_current_chat="",)
+btn1 = InlineKeyboardButton("Search Here",switch_inline_query_current_chat="",)
 btn2 = InlineKeyboardButton("Go Inline", switch_inline_query="")
 
-User_Queue = {}
 active_list = []
 queue = []
 
@@ -43,34 +40,35 @@ def link_fil(filter, client, update):
     else:
         return False
 
-
 link_filter = filters.create(link_fil, name="link_filter")
 
 
 @Client.on_inline_query()
-async def search(client, InlineQuery: InlineQuery):
+async def search(client, InlineQuery : InlineQuery):
     query = InlineQuery.query
     backend = AioHttpBackend()
     api = PornhubApi(backend=backend)
     results = []
     try:
-        src = await api.search.search(query)  # , ordering="mostviewed")
+        src = await api.search.search(query)#, ordering="mostviewed")
     except ValueError as e:
         results.append(InlineQueryResultArticle(
-            title="No Such Videos Found!",
-            description="Sorry! No Such Vedos Were Found. Plz Try Again",
-            input_message_content=InputTextMessageContent(
-                message_text="No Such Videos Found!"
-            )
-        ))
+                title="No Such Videos Found!",
+                description="Sorry! No Such Vedos Were Found. Plz Try Again",
+                input_message_content=InputTextMessageContent(
+                    message_text="No Such Videos Found!"
+                )
+            ))
         await InlineQuery.answer(results,
-                                 switch_pm_text="Search Results",
-                                 switch_pm_parameter="start")
-
+                            switch_pm_text="Search Results",
+                            switch_pm_parameter="start")
+            
         return
+
 
     videos = src.videos
     await backend.close()
+    
 
     for vid in videos:
 
@@ -91,7 +89,7 @@ async def search(client, InlineQuery: InlineQuery):
                 f"Link : {vid.url}")
 
         msg = f"{vid.url}"
-
+         
         results.append(InlineQueryResultArticle(
             title=vid.title,
             input_message_content=InputTextMessageContent(
@@ -106,34 +104,27 @@ async def search(client, InlineQuery: InlineQuery):
         ))
 
     await InlineQuery.answer(results,
-                             switch_pm_text="Search Results",
-                             switch_pm_parameter="start")
+                            switch_pm_text="Search Results",
+                            switch_pm_parameter="start")
 
+
+    
 
 @Client.on_message(link_filter)
-async def options(client, message: Message):
-    try:
-        if not await is_subscribed(client, message):
-            return await force_sub(client, message)
-
-        await message.reply("What would like to do?", reply_to_message_id=message.id,
-                            reply_markup=InlineKeyboardMarkup([
-                                [InlineKeyboardButton(
-                                    text="🔻 Download 🔻", callback_data= f"d_{message.text}"),
-                                 InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
-
-                                [InlineKeyboardButton(
-                                    text="📺 Watch Video 📺    ",url=message.text)]
-                            ])
-                            )
-    except Exception as e:
-        print(e)
+async def options(client, message : Message):
+    if not await is_subscribed(client, message):
+        return await force_sub(client, message)
+    await message.reply("What would like to do?", reply_to_message_id=message.id,
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton(text= "🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="📺 Watch Video 📺",url=message.text)]
+            ])
+            )
 
 
 @Client.on_callback_query(filters.regex("^d"))
-async def single_download(client:Client , callback: CallbackQuery):
-    url = callback.data.split("_", 1)[1]
-    msg = await callback.message.edit(f"**Link:-** {url}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
+async def download_video(client, callback : CallbackQuery):
+    url = callback.data.split("_",1)[1]
+    msg = await callback.message.edit("Downloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...")
     user_id = callback.message.from_user.id
 
     if user_id in active_list:
@@ -143,8 +134,8 @@ async def single_download(client:Client , callback: CallbackQuery):
         active_list.append(user_id)
 
     ydl_opts = {
-        "progress_hooks": [lambda d: download_progress_hook(d, callback.message, client)]
-    }
+            "progress_hooks": [lambda d: download_progress_hook(d, callback.message, client)]
+        }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         try:
@@ -153,10 +144,11 @@ async def single_download(client:Client , callback: CallbackQuery):
             await callback.message.edit("Sorry, There was a problem with that particular video")
             return
 
+
     for file in os.listdir('.'):
         if file.endswith(".mp4"):
-            await callback.message.reply_video(f"{file}", caption=f"**File Name:-** <code>{file}</code>\n\n**Here Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
-                                               reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
+            await callback.message.reply_video(f"{file}", caption=f"**Here Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
+                                reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
             os.remove(f"{file}")
             break
         else:
@@ -164,63 +156,3 @@ async def single_download(client:Client , callback: CallbackQuery):
 
     await msg.delete()
     active_list.remove(user_id)
-
-
-@Client.on_callback_query(filters.regex("^m"))
-async def multiple_download(client, callback: CallbackQuery):
-    global User_Queue
-    user_id = callback.from_user.id
-
-    if user_id not in User_Queue:
-        User_Queue.update({user_id: [callback.data.split('_', 1)[1]]})
-        while True:
-            link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.", filters=filters.text)
-
-            if str(link.text).startswith("https://www.pornhub"):
-                User_Queue[user_id].append(link.text)
-                await callback.message.reply_text("Successfully Added To Queue ✅", reply_to_message_id=link.id)
-
-            elif link.text == "/done":
-                user = User_Queue[user_id]
-                links = ""
-                for idx, link in enumerate(user):
-                    links += f"{(idx+1)}. {link}\n"
-
-                await callback.message.reply_text(f"👤 <code>{callback.message.from_user.first_name}</code>\n\n <code>{links}</code>")
-                break
-
-            else:
-                await callback.answer("Please Send a Valid Link!")
-                continue
-
-    await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading. It may take some time...")
-    
-    
-    while True:
-        msg = await callback.message.reply_text(f"**Link:-** {User_Queue[user_id][0]}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
-        ydl_opts = {
-        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)]
-        }
-
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            try:
-                await run_async(ydl.download, [User_Queue[user_id][0]])
-            except DownloadError:
-                await callback.message.edit("Sorry, There was a problem with that particular video")
-                return
-
-        for file in os.listdir('.'):
-            if file.endswith(".mp4"):
-                await callback.message.reply_video(f"{file}", caption=f"**File Name:-** <code>{file}</code>\n\n**Here Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
-                                                reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
-                os.remove(f"{file}")
-                break
-            else:
-                continue
-
-        await msg.delete()
-        User_Queue[user_id].pop(0)
-        if not User_Queue[user_id]:
-            break
-        continue
-        
