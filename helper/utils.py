@@ -4,12 +4,8 @@ from datetime import datetime
 from pytz import timezone
 from pyrogram.errors.exceptions import MessageNotModified, FloodWait, UserNotParticipant
 from pyrogram import enums
-import asyncio
-import logging
+import asyncio, logging
 import threading
-from youtube_dl.utils import DownloadError
-import youtube_dl
-import os
 from config import Config, Txt
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -104,7 +100,7 @@ def edit_msg(client, message, to_edit):
     except MessageNotModified:
         pass
     except FloodWait as e:
-        client.loop.create_task(asyncio.sleep(e.value))
+        client.loop.create_task(asyncio.sleep(e.x))
     except TypeError:
         pass
 
@@ -144,41 +140,3 @@ async def force_sub(bot, cmd):
     text = "**Sᴏʀʀy Dᴜᴅᴇ Yᴏᴜ'ʀᴇ Nᴏᴛ Jᴏɪɴᴇᴅ My Cʜᴀɴɴᴇʟ 😐. Sᴏ Pʟᴇᴀꜱᴇ Jᴏɪɴ Oᴜʀ Uᴩᴅᴀᴛᴇ Cʜᴀɴɴᴇʟ Tᴏ Cᴄᴏɴᴛɪɴᴜᴇ**"
 
     return await cmd.reply_text(text=text, reply_markup=InlineKeyboardMarkup(buttons))
-
-
-async def run_async(func, *args, **kwargs):
-    loop = asyncio.get_running_loop()
-    print("This is loop", loop)
-    return await loop.run_in_executor(None, func, *args, **kwargs)
-
-
-async def Download_Porn_Video(client, callback, link):
-
-    btn1 = InlineKeyboardButton(
-        "Search Here", switch_inline_query_current_chat="",)
-    btn2 = InlineKeyboardButton("Go Inline", switch_inline_query="")
-    url = link
-    msg = await callback.message.reply_text(f"**Link:-** {link}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
-
-    ydl_opts = {
-        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
-
-    }
-
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        try:
-            await run_async(ydl.download, [url])
-        except DownloadError:
-            await msg.edit(f"**Link:-** {url}\n\n☹️ Sorry, There was a problem with that particular video")
-            return
-
-    for file in os.listdir('.'):
-        if file.endswith(".mp4"):
-            await client.send_video(callback.from_user.id, f"{file}", caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}",
-                                    reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
-            os.remove(f"{file}")
-            break
-        else:
-            continue
-
-    await msg.delete()
