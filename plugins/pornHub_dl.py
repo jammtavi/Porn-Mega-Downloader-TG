@@ -230,12 +230,15 @@ async def multiple_download(client, callback: CallbackQuery):
                     continue
 
         await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
-        if queue_links[user_id]:
+        
+        
+        if user_id in queue_links:
             try:
                await Download_Porn_Video(client, callback)
             except Exception as e:
                 print(e)
-               
+        else:
+            return
     except Exception as e:
         print('Error on line {}'.format(
             sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
