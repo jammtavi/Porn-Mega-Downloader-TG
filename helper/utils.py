@@ -100,7 +100,8 @@ def edit_msg(client, message, to_edit):
     except MessageNotModified:
         pass
     except FloodWait as e:
-        client.loop.create_task(asyncio.sleep(e.value))
+        client.loop.create_task(message.edit(to_edit))
+        pass
     except TypeError:
         pass
 
@@ -114,7 +115,7 @@ def download_progress_hook(d, message, client):
         eta = d.get('_eta_str', "N/A")
         percent = d.get("_percent_str", "N/A")
         speed = d.get("_speed_str", "N/A")
-        to_edit = f"<b><u>Downloading File</b></u> \n<b>File Name :</b> <code>{file_name}</code> \n<b>File Size :</b> <code>{total}</code> \n<b>Speed :</b> <code>{speed}</code> \n<b>ETA :</b> <code>{eta}</code> \n<i>Downloaded {current} out of {total}</i> (__{percent}__)"
+        to_edit = f"<b><u>Downloading File</b></u> \n<b>File Name :</b> <code>{file_name}</code> \n<b>File Size :</b> <code>{total}</code> \n<b>Speed :</b> <code>{speed}</code> \n<b>ETA :</b> <code>{eta}</code> \n<i>Downloaded {current} out of {total}</i> (__{percent}__)\n\n<b> ⚠️ If its looks stuck don't panic have patience it happens cause of server lost it's connection so it try to reconnect to the server that's why don't worry it happens only sometimes when the files size is large </b>"
         threading.Thread(target=edit_msg, args=(
             client, message, to_edit)).start()
 
@@ -140,3 +141,5 @@ async def force_sub(bot, cmd):
     text = "**Sᴏʀʀy Dᴜᴅᴇ Yᴏᴜ'ʀᴇ Nᴏᴛ Jᴏɪɴᴇᴅ My Cʜᴀɴɴᴇʟ 😐. Sᴏ Pʟᴇᴀꜱᴇ Jᴏɪɴ Oᴜʀ Uᴩᴅᴀᴛᴇ Cʜᴀɴɴᴇʟ Tᴏ Cᴄᴏɴᴛɪɴᴜᴇ**"
 
     return await cmd.reply_text(text=text, reply_markup=InlineKeyboardMarkup(buttons))
+
+
