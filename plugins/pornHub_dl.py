@@ -39,8 +39,7 @@ async def Download_Porn_Video(client, message, link):
     user_id = message.from_user.id
 
     ydl_opts = {
-        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
-        "format": "mkv"
+        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)]
     }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -51,7 +50,7 @@ async def Download_Porn_Video(client, message, link):
             return
 
     for file in os.listdir('.'):
-        if file.endswith(".mkv"):
+        if file.endswith(".mkv") or file.endswith('.mp4'):
             await client.send_video(user_id, f"{file}",  caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}", reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
             os.remove(f"{file}")
             break
@@ -166,8 +165,7 @@ async def download_video(client: Client, message: Message):
         active_list.append(user_id)
 
     ydl_opts = {
-        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)],
-        "format": "mkv"
+        "progress_hooks": [lambda d: download_progress_hook(d, msg, client)]
     }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -178,7 +176,7 @@ async def download_video(client: Client, message: Message):
             return
 
     for file in os.listdir('.'):
-        if file.endswith(".mkv"):
+        if file.endswith(".mkv") or file.endswith('mp4'):
             await client.send_video(user_id, f"{file}", caption=f"**File Name:- {file}\n\nHere Is your Requested Video**\nPowered By - @{Config.BOT_USERNAME}", reply_markup=InlineKeyboardMarkup([[btn1, btn2]]))
             os.remove(f"{file}")
             break
