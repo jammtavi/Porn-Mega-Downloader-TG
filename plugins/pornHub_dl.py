@@ -37,8 +37,6 @@ index = 0
 
 async def Download_Porn_Video(client, callback):
     global index
-    print("INDEX", index)
-    print("QUQUE", queue_links)
     user_id = callback.from_user.id
     
     msg = await callback.message.reply_text(f"**Link:-** {queue_links[user_id][index]}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
