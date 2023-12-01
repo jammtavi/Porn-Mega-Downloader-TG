@@ -35,7 +35,7 @@ index = 0
 
 # Queue Downloads
 
-async def Download_Porn_Video(client, callback):
+async def Download_Porn_Video(client, callback, link_msg):
     global index
     user_id = callback.from_user.id
     
@@ -64,11 +64,16 @@ async def Download_Porn_Video(client, callback):
 
     if queue_links[user_id][index] == queue_links[user_id][len(queue_links[user_id])-1]:
         queue_links.pop(user_id)
-        await callback.message.reply_text("ALL LINKS DOWNLOADED SUCCESSFULLY ✅")
+        try:
+            await callback.message.reply_text(f"ALL LINKS DOWNLOADED SUCCESSFULLY ✅", reply_to_message_id=link_msg.id)
+            return
+        except:
+            await callback.message.reply_text(f"ALL LINKS DOWNLOADED SUCCESSFULLY ✅")
+            
     
     else:
         index += 1
-        await Download_Porn_Video(client=client, callback=callback)
+        await Download_Porn_Video(client=client, callback=callback, link_msg=link_msg)
 
 
 async def run_async(func, *args, **kwargs):
@@ -220,7 +225,7 @@ async def multiple_download(client, callback: CallbackQuery):
                     for idx, link in enumerate(user):
                         links += f"{(idx+1)}. {link}\n"
 
-                    await callback.message.reply_text(f"👤 <code>{callback.from_user.first_name}</code>\n\n <code>{links}</code>")
+                    links_msg = await callback.message.reply_text(f"👤 <code>{callback.from_user.first_name}</code>\n\n <code>{links}</code>")
                     break
 
                 else:
@@ -232,7 +237,7 @@ async def multiple_download(client, callback: CallbackQuery):
         
         if user_id in queue_links:
             try:
-               await Download_Porn_Video(client, callback)
+               await Download_Porn_Video(client, callback, links_msg)
             except Exception as e:
                 print(e)
         else:
