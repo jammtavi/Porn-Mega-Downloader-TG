@@ -106,19 +106,28 @@ def edit_msg(client, message, to_edit):
         pass
 
 
-
 def download_progress_hook(d, message, client):
-    if d['status'] == 'downloading':
-        current = d.get("_downloaded_bytes_str") or humanbytes(
-            int(d.get("downloaded_bytes", 1)))
-        total = d.get("_total_bytes_str") or d.get("_total_bytes_estimate_str")
-        file_name = d.get("filename")
-        eta = d.get('_eta_str', "N/A")
-        percent = d.get("_percent_str", "N/A")
-        speed = d.get("_speed_str", "N/A")
-        to_edit = f"<b><u>Downloading File</b></u> \n<b>File Name :</b> <code>{file_name}</code> \n<b>File Size :</b> <code>{total}</code> \n<b>Speed :</b> <code>{speed}</code> \n<b>ETA :</b> <code>{eta}</code> \n<i>Downloaded {current} out of {total}</i> (__{percent}__)"
-        threading.Thread(target=edit_msg, args=(
-            client, message, to_edit)).start()
+    try:
+        if d['status'] == 'downloading':
+            current = d.get("_downloaded_bytes_str") or humanbytes(
+                int(d.get("downloaded_bytes", 1)))
+            total = d.get("_total_bytes_str") or d.get("_total_bytes_estimate_str")
+            file_name = d.get("filename")
+            eta = d.get('_eta_str', "N/A")
+            percent = d.get("_percent_str", "N/A")
+            speed = d.get("_speed_str", "N/A")
+            to_edit = (
+                f"<b><u>Downloading File</b></u> \n<b>File Name :</b> <code>{file_name}</code> \n"
+                f"<b>File Size :</b> <code>{total}</code> \n<b>Speed :</b> <code>{speed}</code> \n"
+                f"<b>ETA :</b> <code>{eta}</code> \n<i>Downloaded {current} out of {total}</i> (__{percent}__)"
+            )
+
+            # Initialize the event loop in the thread
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.create_task(edit_msg(client, message, to_edit))
+    except Exception as e:
+        print(f"Error in download_progress_hook: {e}")
 
 
 
@@ -143,5 +152,3 @@ async def force_sub(bot, cmd):
     text = "**Sᴏʀʀy Dᴜᴅᴇ Yᴏᴜ'ʀᴇ Nᴏᴛ Jᴏɪɴᴇᴅ My Cʜᴀɴɴᴇʟ 😐. Sᴏ Pʟᴇᴀꜱᴇ Jᴏɪɴ Oᴜʀ Uᴩᴅᴀᴛᴇ Cʜᴀɴɴᴇʟ Tᴏ Cᴄᴏɴᴛɪɴᴜᴇ**"
 
     return await cmd.reply_text(text=text, reply_markup=InlineKeyboardMarkup(buttons))
-
-
