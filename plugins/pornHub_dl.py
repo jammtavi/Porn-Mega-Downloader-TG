@@ -64,6 +64,7 @@ async def Download_Porn_Video(client, callback, link_msg):
 
     if queue_links[user_id][index] == queue_links[user_id][len(queue_links[user_id])-1]:
         queue_links.pop(user_id)
+        index = 0
         try:
             await callback.message.reply_text(f"ALL LINKS DOWNLOADED SUCCESSFULLY ✅", reply_to_message_id=link_msg.id)
             return
