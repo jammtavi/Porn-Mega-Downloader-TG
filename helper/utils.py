@@ -94,24 +94,21 @@ def humanbytes(size):
     return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
 
 
-def edit_msg(client, message, to_edit):
+async def edit_msg(client, message, to_edit):
     try:
-        loop = asyncio.get_event_loop()
-        asyncio.run_coroutine_threadsafe(message.edit(to_edit), loop)
+        await message.edit(to_edit, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('♻️ Retry', callback_data='retry_download')]]))
     except MessageNotModified:
         pass
     except FloodWait as e:
-        asyncio.run_coroutine_threadsafe(asyncio.sleep(e.value), loop)
+        await asyncio.sleep(e.x)
         pass
     except TypeError:
         pass
 
-
-def download_progress_hook(d, message, client):
+async def download_progress_hook(d, message, client):
     try:
         if d['status'] == 'downloading':
-            current = d.get("_downloaded_bytes_str") or humanbytes(
-                int(d.get("downloaded_bytes", 1)))
+            current = d.get("_downloaded_bytes_str") or humanbytes(int(d.get("downloaded_bytes", 1)))
             total = d.get("_total_bytes_str") or d.get("_total_bytes_estimate_str")
             file_name = d.get("filename")
             eta = d.get('_eta_str', "N/A")
@@ -123,13 +120,9 @@ def download_progress_hook(d, message, client):
                 f"<b>ETA :</b> <code>{eta}</code> \n<i>Downloaded {current} out of {total}</i> (__{percent}__)"
             )
 
-            # Initialize the event loop in the thread
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.create_task(edit_msg(client, message, to_edit))
+            await edit_msg(client, message, to_edit)
     except Exception as e:
         print(f"Error in download_progress_hook: {e}")
-
 
 
 async def is_subscribed(bot, query):
