@@ -93,17 +93,17 @@ def humanbytes(size):
         raised_to_pow += 1
     return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
 
-def edit_msg(client, message, to_edit):
+async def edit_msg(client, message, to_edit):
     try:
-        loop = asyncio.get_event_loop()
-        asyncio.run_coroutine_threadsafe(message.edit(to_edit), loop)
+        await message.edit(to_edit)
     except MessageNotModified:
-        pass
+        print("Message not modified.")
     except FloodWait as e:
-        asyncio.run_coroutine_threadsafe(asyncio.sleep(e.value), loop)
-        pass
+        print(f"Flood wait: Sleeping for {e.seconds} seconds.")
+        await asyncio.sleep(e.seconds)
+        await edit_msg(client, message, to_edit)  # Retry after the flood wait
     except TypeError:
-        pass
+        print("Type error occurred.")
 
 
 def download_progress_hook(d, message, client):
