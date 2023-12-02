@@ -155,10 +155,8 @@ async def search(client, InlineQuery: InlineQuery):
                              switch_pm_parameter="start")
 
 
-@Client.on_message(link_filter)
+@Client.on_message(link_filter & filters.user(Config.ADMIN))
 async def options(client, message: Message):
-    if not await is_subscribed(client, message):
-        return await force_sub(client, message)
 
     await message.reply("What would like to do?", reply_to_message_id=message.id,
                         reply_markup=InlineKeyboardMarkup([
