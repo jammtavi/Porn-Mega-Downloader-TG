@@ -175,7 +175,7 @@ async def options(client, message: Message):
         pass
 
     await message.reply("What would like to do?", reply_to_message_id=message.id,
-                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="🔻 Download 🔻", callback_da= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
+                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
                                                            [InlineKeyboardButton(
                                                                text="📺 Watch Video 📺    ",url=message.text)]
                                                            ])
