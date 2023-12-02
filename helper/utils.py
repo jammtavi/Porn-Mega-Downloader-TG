@@ -93,26 +93,15 @@ def humanbytes(size):
         raised_to_pow += 1
     return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
 
+
 def edit_msg(client, message, to_edit):
     try:
         loop = asyncio.get_event_loop()
-        asyncio.run_coroutine_threadsafe(message.edit(to_edit, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('♻️ Retry', callback_data='retry_download')]])), loop)
+        asyncio.run_coroutine_threadsafe(message.edit(to_edit), loop)
     except MessageNotModified:
         pass
     except FloodWait as e:
         asyncio.run_coroutine_threadsafe(asyncio.sleep(e.value), loop)
-        pass
-    except TypeError:
-        pass
-
-
-async def edit_message(client, message, to_edit):
-    try:
-        await message.edit(to_edit, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('♻️ Retry', callback_data='retry_download')]]))
-    except MessageNotModified:
-        pass
-    except FloodWait as e:
-        await asyncio.sleep(e.value)
         pass
     except TypeError:
         pass
@@ -134,9 +123,10 @@ def download_progress_hook(d, message, client):
                 f"<b>ETA :</b> <code>{eta}</code> \n<i>Downloaded {current} out of {total}</i> (__{percent}__)"
             )
 
+            # Initialize the event loop in the thread
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            asyncio.run_coroutine_threadsafe(edit_message(client, message, to_edit), loop)
+            loop.create_task(edit_msg(client, message, to_edit))
     except Exception as e:
         print(f"Error in download_progress_hook: {e}")
 
