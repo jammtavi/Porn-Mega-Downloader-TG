@@ -244,6 +244,8 @@ async def multiple_download(client, callback: CallbackQuery):
                     break
 
                 elif link.text == "/cancel":
+                    global index
+                    index = 0
                     await callback.message.reply_text(f"**Process Canceled Successfully ⛔**")
                     callback.stop_propagation()
                     break
