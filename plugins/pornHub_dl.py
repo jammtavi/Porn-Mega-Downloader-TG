@@ -163,8 +163,11 @@ async def options(client, message: Message):
         for file in os.listdir('.'):
             if file.endswith('.mp4') or file.endswith('.mkv'):
                 os.remove(file)
-        if message.from_user.id in queue_links or message.from_user.id in active_list:
+                
+        if message.from_user.id in queue_links:
             queue_links.pop(message.from_user.id)
+        
+        elif message.from_user.id in active_list:
             active_list.remove(message.from_user.id)
     
     except:
