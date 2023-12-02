@@ -157,6 +157,18 @@ async def search(client, InlineQuery: InlineQuery):
 
 @Client.on_message(link_filter & filters.user(Config.ADMIN))
 async def options(client, message: Message):
+    
+    # deleting things before downloading 
+    try:
+        for file in os.listdir('.'):
+            if file.endswith('.mp4') or file.endswith('.mkv'):
+                os.remove(file)
+        if message.from_user.id in queue_links or message.from_user.id in active_list:
+            queue_links.pop(message.from_user.id)
+            active_list.remove(message.from_user.id)
+    
+    except:
+        pass
 
     await message.reply("What would like to do?", reply_to_message_id=message.id,
                         reply_markup=InlineKeyboardMarkup([
