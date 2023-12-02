@@ -7,7 +7,7 @@ import sys
 import youtube_dl
 from pornhub_api import PornhubApi
 from pornhub_api.backends.aiohttp import AioHttpBackend
-from pyrogram import Client, filters
+from pyrogram import Client, filters, StopPropagation
 from pyrogram.errors.exceptions import UserNotParticipant
 from pyrogram.types import (CallbackQuery, InlineKeyboardButton,
                             InlineKeyboardMarkup, InlineQuery,
@@ -35,10 +35,11 @@ index = 0
 
 # Queue Downloads
 
+
 async def Download_Porn_Video(client, callback, link_msg):
     global index
     user_id = callback.from_user.id
-    
+
     msg = await callback.message.reply_text(f"**Link:-** {queue_links[user_id][index]}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
 
     ydl_opts = {
@@ -70,8 +71,7 @@ async def Download_Porn_Video(client, callback, link_msg):
             return
         except:
             await callback.message.reply_text(f"ALL LINKS DOWNLOADED SUCCESSFULLY ✅")
-            
-    
+
     else:
         index += 1
         await Download_Porn_Video(client=client, callback=callback, link_msg=link_msg)
@@ -158,27 +158,27 @@ async def search(client, InlineQuery: InlineQuery):
 
 @Client.on_message(link_filter & filters.user(Config.ADMIN))
 async def options(client, message: Message):
-    
+
     # deleting things before downloading if it's available
     try:
         for file in os.listdir('.'):
             if file.endswith('.mp4') or file.endswith('.mkv'):
                 os.remove(file)
-                
+
         if message.from_user.id in queue_links:
             queue_links.pop(message.from_user.id)
-        
+
         elif message.from_user.id in active_list:
             active_list.remove(message.from_user.id)
-    
+
     except:
         pass
 
     await message.reply("What would like to do?", reply_to_message_id=message.id,
-                        reply_markup=InlineKeyboardMarkup([
-                            [InlineKeyboardButton(text="🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
-                            [InlineKeyboardButton(text="📺 Watch Video 📺  ",url=message.text)]
-                        ])
+                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="🔻 Download 🔻", callback_da= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
+                                                           [InlineKeyboardButton(
+                                                               text="📺 Watch Video 📺    ",url=message.text)]
+                                                           ])
                         )
 
 
@@ -224,7 +224,6 @@ async def multiple_download(client, callback: CallbackQuery):
         global queue_links
         user_id = callback.from_user.id
 
-
         if user_id not in queue_links:
             queue_links.update({user_id: [callback.data.split('_', 1)[1]]})
             while True:
@@ -247,23 +246,29 @@ async def multiple_download(client, callback: CallbackQuery):
                     global index
                     index = 0
                     await callback.message.reply_text(f"**Process Canceled Successfully ⛔**")
-                    callback.stop_propagation()
                     break
 
                 else:
                     callback.answer("Please Send Valid Link !")
                     continue
+        try:
 
-        await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
-        
-        
-        if user_id in queue_links:
-            try:
-               await Download_Porn_Video(client, callback, links_msg)
-            except Exception as e:
-                print(e)
-        else:
-            return
+            if link.text == '/cancel':
+                return
+
+            else:
+                await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
+
+                if user_id in queue_links:
+                    try:
+                        await Download_Porn_Video(client, callback, links_msg)
+                    except Exception as e:
+                        print(e)
+                else:
+                    return
+        except:
+            await callback.message.edit("Link is invalid now as you canceled the process send link again 🔗")
+
     except Exception as e:
         print('Error on line {}'.format(
             sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
