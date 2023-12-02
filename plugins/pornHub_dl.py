@@ -159,7 +159,7 @@ async def search(client, InlineQuery: InlineQuery):
 @Client.on_message(link_filter & filters.user(Config.ADMIN))
 async def options(client, message: Message):
     
-    # deleting things before downloading 
+    # deleting things before downloading if it's available
     try:
         for file in os.listdir('.'):
             if file.endswith('.mp4') or file.endswith('.mkv'):
@@ -224,10 +224,11 @@ async def multiple_download(client, callback: CallbackQuery):
         global queue_links
         user_id = callback.from_user.id
 
+
         if user_id not in queue_links:
             queue_links.update({user_id: [callback.data.split('_', 1)[1]]})
             while True:
-                link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.", filters=filters.text)
+                link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.\nOr use /cancel", filters=filters.text)
 
                 if str(link.text).startswith("https://www.pornhub"):
                     queue_links[user_id].append(link.text)
@@ -240,6 +241,11 @@ async def multiple_download(client, callback: CallbackQuery):
                         links += f"{(idx+1)}. {link}\n"
 
                     links_msg = await callback.message.reply_text(f"👤 <code>{callback.from_user.first_name}</code>\n\n <code>{links}</code>")
+                    break
+
+                elif link.text == "/cancel":
+                    await callback.message.reply_text(f"**Process Canceled Successfully ⛔**")
+                    callback.stop_propagation()
                     break
 
                 else:
