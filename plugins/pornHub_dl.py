@@ -40,7 +40,7 @@ async def Download_Porn_Video(client, callback, link_msg):
     global index
     user_id = callback.from_user.id
 
-    msg = await callback.message.reply_text(f"**Link:-** {queue_links[user_id][index]}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
+    msg = await callback.message.reply_text(f"**{index+1}. Link:-** {queue_links[user_id][index]}\n\nDownloading... Please Have Patience\n 𝙇𝙤𝙖𝙙𝙞𝙣𝙜...", disable_web_page_preview=True)
 
     ydl_opts = {
         "progress_hooks": [lambda d: download_progress_hook(d, msg, client)]
