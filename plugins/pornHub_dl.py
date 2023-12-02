@@ -175,7 +175,7 @@ async def options(client, message: Message):
         pass
 
     await message.reply("What would like to do?", reply_to_message_id=message.id,
-                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="🔻 Download 🔻", callback_data= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
+                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="🔻 Download 🔻", callback_da= f"d_{message.text}"), InlineKeyboardButton(text="➕ Add Multiple Links ➕", callback_data=f"m_{message.text}")],
                                                            [InlineKeyboardButton(
                                                                text="📺 Watch Video 📺    ",url=message.text)]
                                                            ])
@@ -227,7 +227,7 @@ async def multiple_download(client, callback: CallbackQuery):
         if user_id not in queue_links:
             queue_links.update({user_id: [callback.data.split('_', 1)[1]]})
             while True:
-                link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.\nOr use /cancel", filters=filters.text)
+                link = await client.ask(chat_id=user_id, text="🔗Send Link to add it to queue 🔗\n\nUse /done when you're done adding links to queue.", filters=filters.text)
 
                 if str(link.text).startswith("https://www.pornhub"):
                     queue_links[user_id].append(link.text)
@@ -242,33 +242,24 @@ async def multiple_download(client, callback: CallbackQuery):
                     links_msg = await callback.message.reply_text(f"👤 <code>{callback.from_user.first_name}</code>\n\n <code>{links}</code>")
                     break
 
-                elif link.text == "/cancel":
-                    global index
-                    index = 0
-                    await callback.message.reply_text(f"**Process Canceled Successfully ⛔**")
-                    break
-
                 else:
-                    callback.answer("Please Send Valid Link !")
+                    callback.answer("⚠️ Please Send Valid Link !")
                     continue
-        try:
+                
 
-            if link.text == '/cancel':
-                return
+        await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
 
-            else:
-                await callback.message.reply_text("Downloading Started ✅\n\nPlease have patience while it's downloading it may take sometimes...")
-
-                if user_id in queue_links:
-                    try:
-                        await Download_Porn_Video(client, callback, links_msg)
-                    except Exception as e:
-                        print(e)
-                else:
-                    return
-        except:
-            await callback.message.edit("Link is invalid now as you canceled the process send link again 🔗")
+        if user_id in queue_links:
+            try:
+                await Download_Porn_Video(client, callback, links_msg)
+            except Exception as e:
+                print(e)
 
     except Exception as e:
         print('Error on line {}'.format(
             sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
+
+
+@Client.on_message(filters.private & filters.user(Config.ADMIN) & filters.command('cc'))
+async def send_queue(client, message):
+    await message.reply_text(f"Queue List :- {queue_links}\n\n Index :- {index}\n\n Active List :- {active_list}")
