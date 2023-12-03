@@ -142,7 +142,7 @@ async def is_subscribed(bot, query):
 async def force_sub(bot, cmd):
     invite_link = await bot.create_chat_invite_link(int(Config.AUTH_CHANNEL))
     buttons = [[InlineKeyboardButton(
-        text="📢 Cont. Owner to add you in Channel 📢", url="https://t.me/V_Ditu")]]
+        text="📢 Cont. Owner to add you in Channel 📢", url="https://t.me/Snowball_Official")]]
     text = "**Sᴏʀʀy Dᴜᴅᴇ Yᴏᴜ'ʀᴇ Nᴏᴛ Jᴏɪɴᴇᴅ My Cʜᴀɴɴᴇʟ 😐. Sᴏ Pʟᴇᴀꜱᴇ Jᴏɪɴ Oᴜʀ Uᴩᴅᴀᴛᴇ Cʜᴀɴɴᴇʟ Tᴏ Cᴄᴏɴᴛɪɴᴜᴇ**"
 
     return await cmd.reply_text(text=text, reply_markup=InlineKeyboardMarkup(buttons))
